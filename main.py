@@ -7,6 +7,7 @@ import face_recognition
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 import datetime
 from multiprocessing import Pool, cpu_count
+from PIL.ExifTags import TAGS
 
 # Configuration
 OUTPUT_SIZE = (1400, 700)  # width x height
@@ -15,8 +16,6 @@ FRAME_DURATION = 0.2  # seconds per frame
 OUTPUT_GIF = "facelapse.gif"
 CACHE_DIR = "cache"
 FORCE_REPROCESS = "--force" in sys.argv
-START_DATE = datetime.date(2025, 6, 21)
-SKIP_DATE = datetime.date(2025, 7, 25)
 FONT_PATH = "/Library/Fonts/Arial Unicode.ttf"
 FONT_SIZE = 40
 FONT_COLOR = (255, 255, 255)  # White
@@ -28,17 +27,33 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 def get_basename(image_path):
     return os.path.splitext(os.path.basename(image_path))[0]
 
-def get_date_from_index(index):
-    current_date = START_DATE
-    days_added = 0
-    while days_added <= index:
-        if current_date == SKIP_DATE:
-            current_date += datetime.timedelta(days=1)
-            continue
-        if days_added == index:
-            return current_date
-        current_date += datetime.timedelta(days=1)
-        days_added += 1
+def get_date_from_exif(image_path):
+    """Extract date from image EXIF data."""
+    try:
+        with Image.open(image_path) as img:
+            exif = img._getexif()
+            if exif is None:
+                return None
+            
+            for tag_id in exif:
+                tag = TAGS.get(tag_id, tag_id)
+                data = exif.get(tag_id)
+                
+                if tag == "DateTimeOriginal":
+                    # Parse EXIF date format: "2025:06:21 10:30:00"
+                    date_str = data.split()[0]  # Get just the date part
+                    year, month, day = map(int, date_str.split(':'))
+                    return datetime.date(year, month, day)
+                elif tag == "DateTime":
+                    # Fallback to regular DateTime if Original not available
+                    date_str = data.split()[0]
+                    year, month, day = map(int, date_str.split(':'))
+                    return datetime.date(year, month, day)
+    except Exception as e:
+        print(f"⚠️  Could not extract date from {image_path}: {e}")
+        return None
+    
+    return None
 
 def draw_date_text(image, date_text):
     draw = ImageDraw.Draw(image)
@@ -145,10 +160,11 @@ def process_image(image_path, frame_index):
     )
 
     result_img = Image.fromarray(cv2.cvtColor(translated, cv2.COLOR_BGR2RGB))
-    date = get_date_from_index(frame_index)
-    date_text = f"{date.strftime('%b %d, %Y')}"
-
-    draw_date_text(result_img, date_text)
+    
+    date = get_date_from_exif(image_path)
+    if date:
+        date_text = f"{date.strftime('%b %d, %Y')}"
+        draw_date_text(result_img, date_text)
 
     result_img.save(cached_img_path)
     
@@ -161,12 +177,31 @@ def process_image_wrapper(args):
     path, index = args
     return process_image(path, index)
 
+def get_image_date(image_path):
+    """Get the date when the image was taken from EXIF data."""
+    date = get_date_from_exif(image_path)
+    if date is None:
+        # If no EXIF date, use file modification time as fallback
+        mtime = os.path.getmtime(image_path)
+        return datetime.date.fromtimestamp(mtime)
+    return date
+
 def main():
-    image_paths = sorted(glob.glob("raws/day*.jpg"))
+    # Get all image files, excluding those with "_" prefix
+    image_extensions = ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tiff", "*.tif"]
+    all_images = []
+    for ext in image_extensions:
+        all_images.extend(glob.glob(f"raws/{ext}"))
+        all_images.extend(glob.glob(f"raws/{ext.upper()}"))  # Also check uppercase extensions
+    
+    image_paths = [path for path in all_images if not os.path.basename(path).startswith("_")]
     
     if not image_paths:
         print("❌ No images found in raws/ directory")
         return
+    
+    # Sort images by their taken date
+    image_paths.sort(key=get_image_date)
     
     print(f"🔍 Found {len(image_paths)} images")
     
