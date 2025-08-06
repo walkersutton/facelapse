@@ -1,7 +1,7 @@
 [project]
 name = "facelapse"
 version = "0.1.0"
-description = "Create a timelapse of your face"
+description = "create GIFs with your face"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
