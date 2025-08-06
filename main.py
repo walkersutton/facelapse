@@ -7,7 +7,6 @@ import face_recognition
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 import datetime
 from multiprocessing import Pool, cpu_count
-from functools import partial
 
 # Configuration
 OUTPUT_SIZE = (1400, 700)  # width x height
@@ -18,13 +17,10 @@ CACHE_DIR = "cache"
 FORCE_REPROCESS = "--force" in sys.argv
 START_DATE = datetime.date(2025, 6, 21)
 SKIP_DATE = datetime.date(2025, 7, 25)
-# Font Configuration - Edit these directly
 FONT_PATH = "/Library/Fonts/Arial Unicode.ttf"
 FONT_SIZE = 40
 FONT_COLOR = (255, 255, 255)  # White
 TEXT_POSITION = (40, -40)  # (x, y) relative to bottom-right
-
-# Performance settings
 NUM_PROCESSES = max(1, int(cpu_count() * 0.75))  # Use 75% of CPU cores
 
 os.makedirs(CACHE_DIR, exist_ok=True)
@@ -51,7 +47,6 @@ def draw_date_text(image, date_text):
     except:
         font = ImageFont.load_default()
     
-    # Calculate text position
     x, y = TEXT_POSITION
     if y < 0:  # Negative means from bottom
         y = image.height + y - FONT_SIZE
@@ -106,7 +101,6 @@ def process_image(image_path, frame_index):
         borderValue=(0, 0, 0)
     )
 
-    # Re-detect landmarks
     face_landmarks_list = face_recognition.face_landmarks(rotated)
     if not face_landmarks_list:
         print(f"❌ No face detected after rotation in {image_path}")
@@ -132,7 +126,7 @@ def process_image(image_path, frame_index):
     scale = DESIRED_EYE_HEIGHT / current_eye_height
     new_img = cv2.resize(rotated, dsize=None, fx=scale, fy=scale, interpolation=cv2.INTER_LINEAR)
     new_left_eye_center = np.array(left_eye_center) * scale
-    new_right_eye_center = np.array(right_eye_center) * scale
+    # new_right_eye_center = np.array(right_eye_center) * scale
 
     target_left_eye_x = int(OUTPUT_SIZE[0] * 0.35)
     target_eye_y = OUTPUT_SIZE[1] // 2
@@ -152,9 +146,7 @@ def process_image(image_path, frame_index):
 
     result_img = Image.fromarray(cv2.cvtColor(translated, cv2.COLOR_BGR2RGB))
     date = get_date_from_index(frame_index)
-
-    day_str = f"{date.day:2}"  # space-padded, not zero-padded
-    date_text = f"{date.strftime('%B')} {day_str}, {date.year}"
+    date_text = f"{date.strftime('%b %d, %Y')}"
 
     draw_date_text(result_img, date_text)
 
@@ -170,9 +162,6 @@ def process_image_wrapper(args):
     return process_image(path, index)
 
 def main():
-    
-
-    
     image_paths = sorted(glob.glob("raws/day*.jpg"))
     
     if not image_paths:
@@ -181,7 +170,6 @@ def main():
     
     print(f"🔍 Found {len(image_paths)} images")
     
-    # Prepare arguments for multiprocessing
     process_args = [(path, i) for i, path in enumerate(image_paths)]
     
     print(f"🚀 Using {NUM_PROCESSES} processes for parallel processing")
@@ -201,7 +189,7 @@ def main():
         print("❌ No frames processed successfully.")
         return
     
-    # Add hold frames at the end
+    # Hold last frame for a bit
     if frames:
         frames.extend([frames[-1]] * 10)
     
