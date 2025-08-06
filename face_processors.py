@@ -7,6 +7,13 @@ import datetime
 from multiprocessing import Pool, cpu_count
 from PIL.ExifTags import TAGS
 
+# Register HEIC support
+try:
+    import pillow_heif
+    pillow_heif.register_heif_opener()
+except ImportError:
+    print("⚠️  pillow-heif not available. HEIC files will not be supported.")
+
 # Configuration (imported from main.py)
 OUTPUT_SIZE = (1000, 1000)  # width x height
 DESIRED_EYE_HEIGHT = 130

@@ -58,7 +58,7 @@ def get_image_date(image_path):
 
 def main():
     # Get all image files, excluding those with "_" prefix
-    image_extensions = ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tiff", "*.tif", "*.webp"]
+    image_extensions = ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tiff", "*.tif", "*.webp", "*.heic", "*.HEIC"]
     all_images = []
     for ext in image_extensions:
         all_images.extend(glob.glob(f"rawnathan/{ext}"))

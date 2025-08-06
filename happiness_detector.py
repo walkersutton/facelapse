@@ -4,6 +4,13 @@ from PIL import Image, ImageOps
 import json
 from deepface import DeepFace
 
+# Register HEIC support
+try:
+    import pillow_heif
+    pillow_heif.register_heif_opener()
+except ImportError:
+    print("⚠️  pillow-heif not available. HEIC files will not be supported.")
+
 # Configuration
 CACHE_DIR = "ncache"
 FORCE_REPROCESS = False  # Will be set from main.py

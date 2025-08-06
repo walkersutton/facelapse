@@ -12,4 +12,5 @@ dependencies = [
     "pillow>=11.3.0",
     "tf-keras>=2.19.0",
     "tensorflow>=2.15.0",
+    "pillow-heif>=0.15.0",
 ]
