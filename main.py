@@ -17,9 +17,8 @@ from happiness_detector import get_happiness_score
 OUTPUT_SIZE = (1000, 1000)  # width x height
 DESIRED_EYE_HEIGHT = 130
 FRAME_DURATION = 0.2  # seconds per frame
-OUTPUT_GIF = "nfacelapse.gif"
-CACHE_DIR = "ncache"
-FORCE_REPROCESS = "--force" in sys.argv
+OUTPUT_GIF = "facelapse.gif"
+CACHE_DIR = "cache"
 DRAW_DATE = False
 NUM_PROCESSES = max(1, int(cpu_count() * 0.75))  # Use 75% of CPU cores
 
@@ -28,12 +27,10 @@ import face_processors
 face_processors.OUTPUT_SIZE = OUTPUT_SIZE
 face_processors.DESIRED_EYE_HEIGHT = DESIRED_EYE_HEIGHT
 face_processors.CACHE_DIR = CACHE_DIR
-face_processors.FORCE_REPROCESS = FORCE_REPROCESS
 face_processors.DRAW_DATE = DRAW_DATE
 
 import happiness_detector
 happiness_detector.CACHE_DIR = CACHE_DIR
-happiness_detector.FORCE_REPROCESS = FORCE_REPROCESS
 
 os.makedirs(CACHE_DIR, exist_ok=True)
 
@@ -61,13 +58,13 @@ def main():
     image_extensions = ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tiff", "*.tif", "*.webp", "*.heic", "*.HEIC"]
     all_images = []
     for ext in image_extensions:
-        all_images.extend(glob.glob(f"rawnathan/{ext}"))
-        all_images.extend(glob.glob(f"rawnathan/{ext.upper()}"))  # Also check uppercase extensions
+        all_images.extend(glob.glob(f"raws/{ext}"))
+        all_images.extend(glob.glob(f"raws/{ext.upper()}"))  # Also check uppercase extensions
     
     image_paths = [path for path in all_images if not os.path.basename(path).startswith("_")]
     
     if not image_paths:
-        print("❌ No images found in rawnathan/ directory")
+        print("❌ No images found in raws/ directory")
         return
     
     # Sort images based on configuration

@@ -18,7 +18,6 @@ except ImportError:
 OUTPUT_SIZE = (1000, 1000)  # width x height
 DESIRED_EYE_HEIGHT = 130
 CACHE_DIR = "ncache"
-FORCE_REPROCESS = False  # Will be set from main.py
 DRAW_DATE = False
 FONT_PATH = "/Library/Fonts/Arial Unicode.ttf"
 FONT_SIZE = 40
@@ -84,7 +83,7 @@ class FaceProcessor:
         """Load and preprocess image, check cache first."""
         cached_img_path = self.get_cache_path(image_path)
         
-        if os.path.exists(cached_img_path) and not FORCE_REPROCESS:
+        if os.path.exists(cached_img_path):
             cached_img = Image.open(cached_img_path)
             return cached_img.convert('RGB')
         

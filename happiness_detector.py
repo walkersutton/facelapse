@@ -13,7 +13,6 @@ except ImportError:
 
 # Configuration
 CACHE_DIR = "ncache"
-FORCE_REPROCESS = False  # Will be set from main.py
 HAPPINESS_CACHE_FILE = os.path.join(CACHE_DIR, "happiness_scores.json")
 
 def analyze_happiness(image_path):
@@ -63,7 +62,7 @@ def get_happiness_score(image_path):
             happiness_scores = {}
     
     # Check if we have a cached score
-    if image_path in happiness_scores and not FORCE_REPROCESS:
+    if image_path in happiness_scores:
         return happiness_scores[image_path]
     
     # Calculate happiness score
