@@ -1,20 +1,14 @@
-# Facelapse
+<div align="center" style="text-align: center;">
+  <h1>Facelapse</h1>
+  <img src="https://raw.githubusercontent.com/walkersutton/facelapse/refs/heads/main/facelapse.gif"/ style="width: 269px;">
+</div>
 
 ## Requirements
 * Python
 * [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 ## How To
-1. create a directory, `raws`, and add images of your face (images will be compiled in numerical order)
-2. execute `uv run main.py`
-3. open `facelapse.gif`
-
-## Notes
-* `main.py` is currently configured to anchor the timelapse on the left eye - you'll have to make some modifications to anchor the timelapse on a different facial feature
-
-## Appendix
-
-### Convert HEIC files in current directory -> jpg
-```
-for f in *.HEIC; do sips -s format jpeg "$f" --out "${f%.*}.jpg"; done;
-```
+1. add images of your face to the `raws` directory
+2. play around with image compilation ordering, export dimensions, quality, etc.
+3. execute `uv run main.py`
+4. open `facelapse.gif`
