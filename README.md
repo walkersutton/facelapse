@@ -10,7 +10,7 @@
 3. open `facelapse.gif`
 
 ## Notes
-* `main.py` is currently configured to anchor the facelapse on the left eye - you'll have to make some modifications to anchor facelapse on a different facial feature
+* `main.py` is currently configured to anchor the timelapse on the left eye - you'll have to make some modifications to anchor facelapse on a different facial feature
 
 ## Appendix
 
