@@ -1,8 +1,9 @@
 import glob
 import os
-import sys
 import datetime
 from multiprocessing import Pool, cpu_count
+import argparse
+
 
 # Import our modular components
 from face_processors import (
@@ -19,7 +20,6 @@ DESIRED_EYE_HEIGHT = 130
 FRAME_DURATION = 0.2  # seconds per frame
 OUTPUT_GIF = "facelapse.gif"
 CACHE_DIR = "cache"
-DRAW_DATE = False
 NUM_PROCESSES = max(1, int(cpu_count() * 0.75))  # Use 75% of CPU cores
 
 # Update configuration in imported modules
@@ -27,22 +27,23 @@ import face_processors
 face_processors.OUTPUT_SIZE = OUTPUT_SIZE
 face_processors.DESIRED_EYE_HEIGHT = DESIRED_EYE_HEIGHT
 face_processors.CACHE_DIR = CACHE_DIR
-face_processors.DRAW_DATE = DRAW_DATE
 
 import happiness_detector
 happiness_detector.CACHE_DIR = CACHE_DIR
 
 os.makedirs(CACHE_DIR, exist_ok=True)
 
-def process_image(image_path, frame_index):
+def process_image(image_path, frame_index, anchor, draw_date):
     """Main processing function - currently uses full face method."""
-    return full_face_processor.process(image_path, frame_index)
-    # return left_eye_processor.process(image_path, frame_index)
+    if anchor == "left-eye":
+        return left_eye_processor.process(image_path, frame_index, draw_date)
+    else:
+        return full_face_processor.process(image_path, frame_index, draw_date)
 
 def process_image_wrapper(args):
     """Wrapper function for multiprocessing."""
-    path, index = args
-    return process_image(path, index)
+    path, index, anchor, draw_date = args
+    return process_image(path, index, anchor, draw_date)
 
 def get_image_date(image_path):
     """Get the date when the image was taken from EXIF data."""
@@ -66,16 +67,40 @@ def main():
     if not image_paths:
         print("❌ No images found in raws/ directory")
         return
-    
-    # Sort images based on configuration
-    image_paths.sort(key=get_happiness_score, reverse=True)
-    # image_paths.sort(key=get_image_date)
-    # image_paths.sort()  # Sort by filename
 
+    parser = argparse.ArgumentParser(description='create GIF of face')
+    parser.add_argument(
+        '--sort',
+        choices=['happiness', 'date', 'filename'],
+        default='date',
+        help='Sort order for results (default: date)'
+    )
+    parser.add_argument(
+        '--anchor',
+        choices=['left-eye', 'face'],
+        default='face',
+        help='Visual anchor for GIF (default: face)'
+    )
+    parser.add_argument(
+        '--draw-date',
+        action='store_true',
+        help='Draw date on the GIF'
+    )
+    args = parser.parse_args()
+    sort_order = args.sort
+    anchor = args.anchor
+    draw_date = args.draw_date
+
+    if sort_order == 'happiness':
+        image_paths.sort(key=get_happiness_score, reverse=False)
+    elif sort_order == 'filename':
+        image_paths.sort()  # Sort by filename (?)
+    else:
+        image_paths.sort(key=get_image_date)
     
     print(f"🔍 Found {len(image_paths)} images")
     
-    process_args = [(path, i) for i, path in enumerate(image_paths)]
+    process_args = [(path, i, anchor, draw_date) for i, path in enumerate(image_paths)]
     
     print(f"🚀 Using {NUM_PROCESSES} processes for parallel processing")
     

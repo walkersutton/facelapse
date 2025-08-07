@@ -17,8 +17,7 @@ except ImportError:
 # Configuration (imported from main.py)
 OUTPUT_SIZE = (1000, 1000)  # width x height
 DESIRED_EYE_HEIGHT = 130
-CACHE_DIR = "ncache"
-DRAW_DATE = False
+CACHE_DIR = "cache"
 FONT_PATH = "/Library/Fonts/Arial Unicode.ttf"
 FONT_SIZE = 40
 FONT_COLOR = (255, 255, 255)  # White
@@ -133,10 +132,10 @@ class FaceProcessor:
             borderValue=(0, 0, 0)
         )
     
-    def finalize_image(self, result_img, image_path):
+    def finalize_image(self, result_img, image_path, draw_date):
         """Add date text and save to cache."""
         date = get_date_from_exif(image_path)
-        if DRAW_DATE and date:
+        if draw_date and date:
             date_text = f"{date.strftime('%b %d, %Y')}"
             draw_date_text(result_img, date_text)
         
@@ -157,7 +156,7 @@ class LeftEyeProcessor(FaceProcessor):
     def __init__(self):
         super().__init__("left_eye")
     
-    def process(self, image_path, frame_index):
+    def process(self, image_path, frame_index, draw_date):
         """Process image focusing on left eye alignment."""
         img = self.load_and_preprocess_image(image_path)
         if isinstance(img, Image.Image):  # Already cached
@@ -213,7 +212,7 @@ class LeftEyeProcessor(FaceProcessor):
         )
         
         result_img = Image.fromarray(cv2.cvtColor(translated, cv2.COLOR_BGR2RGB))
-        return self.finalize_image(result_img, image_path)
+        return self.finalize_image(result_img, image_path, draw_date)
 
 
 class FullFaceProcessor(FaceProcessor):
@@ -222,7 +221,7 @@ class FullFaceProcessor(FaceProcessor):
     def __init__(self):
         super().__init__("full_face")
     
-    def process(self, image_path, frame_index):
+    def process(self, image_path, frame_index, draw_date):
         """Process image centering the full face in the output."""
         img = self.load_and_preprocess_image(image_path)
         if isinstance(img, Image.Image):  # Already cached
@@ -282,7 +281,7 @@ class FullFaceProcessor(FaceProcessor):
         )
         
         result_img = Image.fromarray(cv2.cvtColor(translated, cv2.COLOR_BGR2RGB))
-        return self.finalize_image(result_img, image_path)
+        return self.finalize_image(result_img, image_path, draw_date)
 
 
 # Create processor instances

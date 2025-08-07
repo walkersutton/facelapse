@@ -10,9 +10,9 @@ try:
     pillow_heif.register_heif_opener()
 except ImportError:
     print("⚠️  pillow-heif not available. HEIC files will not be supported.")
-
+d
 # Configuration
-CACHE_DIR = "ncache"
+CACHE_DIR = "cache"
 HAPPINESS_CACHE_FILE = os.path.join(CACHE_DIR, "happiness_scores.json")
 
 def analyze_happiness(image_path):
