@@ -14,11 +14,14 @@
 
 ## CLI args
 * `--sort`
-  [date (default), happiness, filename]
+  * control the order faces appear in GIF
+  * [date (default), happiness, filename]
 * `--anchor`
-  [face (default), left-eye]
+  * determine which facial feature images should anchor to
+  * [face (default), left-eye]
 * `--draw-date`
-  __no value__
+  * add overlay with the date the image was taken
+  * [__no value__]
 
 example w/ args: 
 `uv run main.py --sort happiness --anchor left-eye --draw-date`
