@@ -4,10 +4,12 @@
 </div>
 
 ## Requirements
-* Python
-* [uv](https://docs.astral.sh/uv/getting-started/installation/)
+
+- Python
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 ## How To
+
 1. add images of your face to the `raws` directory
 2. ```bash
    $ uv run main.py
@@ -15,17 +17,19 @@
    ```
 
 ## CLI args
-* `--sort`
-  * control the order faces appear in GIF
-  * [date (default), happiness, filename]
-* `--anchor`
-  * determine which facial feature images should anchor to
-  * [face (default), left-eye]
-* `--draw-date`
-  * add overlay with the date the image was taken
-  * [__no value__]
+
+- `--sort`
+  - control the order faces appear in GIF
+  - [date (default), happiness, filename]
+- `--anchor`
+  - determine which facial feature images should anchor to
+  - [face (default), left-eye]
+- `--draw-date`
+  - add overlay with the date the image was taken
+  - [__no value__]
 
 ### Example
+
 ```bash
 $ uv run main.py --sort happiness --anchor left-eye --draw-date
 ```
