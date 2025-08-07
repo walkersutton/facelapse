@@ -9,8 +9,10 @@
 
 ## How To
 1. add images of your face to the `raws` directory
-3. execute `uv run main.py`
-4. open `facelapse.gif`
+2. ```bash
+   $ uv run main.py
+   $ open facelapse.gif
+   ```
 
 ## CLI args
 * `--sort`
@@ -23,8 +25,7 @@
   * add overlay with the date the image was taken
   * [__no value__]
 
-example w/ args: 
-`uv run main.py --sort happiness --anchor left-eye --draw-date`
-
-  
-
+### Example
+```bash
+$ uv run main.py --sort happiness --anchor left-eye --draw-date
+```
