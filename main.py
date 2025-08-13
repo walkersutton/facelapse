@@ -15,7 +15,7 @@ from face_processors import (
 from happiness_detector import get_happiness_score
 
 # Configuration
-OUTPUT_SIZE = (1400, 700)  # width x height
+OUTPUT_SIZE = (700, 700)  # width x height
 DESIRED_EYE_HEIGHT = 130
 FRAME_DURATION = 0.2  # seconds per frame
 OUTPUT_GIF = "facelapse.gif"
